@@ -6,16 +6,15 @@ const initialState = {
   loading: true,
 };
 
-
 //The createSlice function is used to create a Redux slice.
-// A slice is a portion of your Redux state, 
+// A slice is a portion of your Redux state,
 export const CategoryApplicationSlice = createSlice({
   name: "appcategories",
   initialState,
-  reducers: {// Reducers to modify the state
+  reducers: {
+    // Reducers to modify the state
     setCategoryApplicationSlice: (state, action) => {
-
-    // action.payload: This is where the new data (categories) is stored.
+      // action.payload: This is where the new data (categories) is stored.
       state.appcategories = action.payload; // Set the categories with the data passed in action.payload
       state.loading = false;
     },
@@ -32,8 +31,27 @@ export const CategoryApplicationSlice = createSlice({
         }
       });
     },
+    deleteCategorySlice: (state, id) => {
+      state.appcategories = state.appcategories.filter(
+        (elt) => elt.id !== id.payload
+      );
+    },
+    addCategorySlice: (state, action) => {
+      state.appcategories.push(action.payload);
+    },
+    updateCategorySlice: (state, action) => {
+      state.appcategories = state.appcategories.map((appcategorie) =>
+        appcategorie.id === action.payload.id ? action.payload : appcategorie
+      );
+    },
+    
   },
 });
 
-export const { setCategoryApplicationSlice, setCategoryApplicationStatus } =
-CategoryApplicationSlice.actions;
+export const {
+  setCategoryApplicationSlice,
+  setCategoryApplicationStatus,
+  deleteCategorySlice,
+  addCategorySlice,
+  updateCategorySlice
+} = CategoryApplicationSlice.actions;

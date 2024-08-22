@@ -1,7 +1,7 @@
 import { put, call } from 'redux-saga/effects';
 import axios from "axios"
 import { createSliceSaga } from "redux-toolkit-saga"
-import { setCategoryApplicationSlice } from './CategoryApplicationSlice';
+import { addCategorySlice, deleteCategorySlice, setCategoryApplicationSlice, updateCategorySlice } from './CategoryApplicationSlice';
 
 export const appcategoriesSaga = createSliceSaga({
     name: "appcategoriesSaga",
@@ -20,7 +20,7 @@ export const appcategoriesSaga = createSliceSaga({
                     )
                 );
                 if (response.status === 201) {
-                    console.log("...");
+                    yield put(addCategorySlice(response.data))
                 }
             } catch (error) {
                 console.log(error);
@@ -31,9 +31,8 @@ export const appcategoriesSaga = createSliceSaga({
                 const response = yield call(() =>
                     axios.delete(`http://localhost:9500/api/categoryApps/${action.payload}`)
                 );
-                if (response.status === 204) {
-                    console.log('Category deleted successfully');
-                    yield put(setCategoryApplicationSlice(response.data))                }
+                if (response.status === 200) {
+                    yield put(deleteCategorySlice(action.payload))                }
             } catch (error) {
                 console.error(error);
             }},
@@ -48,7 +47,7 @@ export const appcategoriesSaga = createSliceSaga({
                     );
                     if (response.status === 200) {
                         console.log('Category updated successfully');
-                        yield put(getappcategoriesList()); 
+                        yield put(updateCategorySlice(action.payload)); 
                     }
                 } catch (error) {
                     console.error(error);

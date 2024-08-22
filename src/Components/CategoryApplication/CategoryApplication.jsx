@@ -16,15 +16,26 @@ import {
   deleteCategory,
   getappcategoriesList,
   postAppCategoriesForm,
+  updateCategory,
 } from "./categoryApplicationSaga";
-import { Navigate, Redirect, useNavigate } from "react-router-dom";
+import { Typography } from "@mui/material";
 
 const CategoryApplication = () => {
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
   const [open, setOpen] = React.useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState(null);
+  const [categoryToEdit, setCategoryToEdit] = useState(null);
+
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-  const navigate = useNavigate();
-  const [redirect, setRedirect] = useState(false);
+  const handleCloseDeleteModal = () => setIsDeleteModalOpen(false);
+
+  const handleCloseEditModal = () => {
+    setIsEditModalOpen(false); // Close the edit modal
+    setCategoryToEdit(null); // Reset the edit data after closing the modal
+  };
   const dispatch = useDispatch();
   const { appcategories } = useSelector((state) => state.appcategorie);
   const [formData, setFormData] = useState({
@@ -42,20 +53,38 @@ const CategoryApplication = () => {
     e.preventDefault();
     dispatch(postAppCategoriesForm({ ...formData }));
     setFormData({ name: "", description: "" }); // Réinitialiser les données du formulaire
-    handleClose(); // Fermer le modal
+    handleClose();
   };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-  const handleDelete = (id) => {
-    dispatch(deleteCategory(id));
+  const handleOpenDeleteModal = (id) => {
+    setCategoryToDelete(id); // Met à jour l'ID de la catégorie à supprimer
+    setIsDeleteModalOpen(true); // Ouvre le modal
+  };
+
+  const handleDeleteConfirmed = () => {
+    dispatch(deleteCategory(categoryToDelete)); // Supprime la catégorie avec la fonction  deleteCategory du sagga
+    setIsDeleteModalOpen(false);
   };
 
   const handleEdit = (id) => {
-    console.log("Edit Category with ID:", id);
+    // Find the category with the given id
+    const category = appcategories.find((category) => category.id === id);
+
+    if (category) {
+      setCategoryToEdit(category); // Set the selected category for editing
+      setIsEditModalOpen(true); // Open the edit modal
+    }
   };
+
+  const handleEditCategory =() => {
+    dispatch(updateCategory(categoryToEdit))
+    setIsEditModalOpen(false);
+
+  }
 
   const columns = [
     { field: "id", headerName: "ID", width: 70 },
@@ -75,15 +104,133 @@ const CategoryApplication = () => {
           <DeleteIcon
             color="warning"
             style={{ cursor: "pointer", marginRight: 8 }}
-            onClick={() => handleDelete(params.row.id)}
+            onClick={() => handleOpenDeleteModal(params.row.id)}
             data-testid="DeleteIcon"
           />
+          <Modal
+            open={isDeleteModalOpen}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+          >
+            <Box className="modal-box-category">
+              <Card>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    padding: 1,
+                  }}
+                >
+                  <IconButton
+                    onClick={handleCloseDeleteModal}
+                    size="large"
+                    aria-label="close modal"
+                    color="inherit"
+                  >
+                    <CloseOutlinedIcon />
+                  </IconButton>
+                </Box>
+
+                <CardContent>
+                  <Typography>
+                    Are you sure you want to delete this category!
+                  </Typography>
+
+                  <Button
+                    onClick={handleDeleteConfirmed}
+                    type="submit"
+                    className="confirmer-button"
+                    variant="contained"
+                    color="success"
+                  >
+                    Yes
+                  </Button>
+                  <Button
+                    onClick={handleCloseDeleteModal}
+                    className="confirmer-button"
+                    variant="contained"
+                    color="error"
+                    sx={{ ml: 2 }}
+                  >
+                    No
+                  </Button>
+                </CardContent>
+              </Card>
+            </Box>
+          </Modal>
+
           <EditIcon
             color="primary"
             style={{ cursor: "pointer" }}
             onClick={() => handleEdit(params.row.id)}
             data-testid="EditIcon"
           />
+          <Modal open={isEditModalOpen} onClose={handleCloseEditModal}>
+            <Box className="modal-box-category">
+              <Card>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    padding: 1,
+                  }}
+                >
+                  <h2>Edit Application's Category</h2>
+                  <IconButton
+                    onClick={handleCloseEditModal}
+                    size="large"
+                    color="inherit"
+                  >
+                    <CloseOutlinedIcon />
+                  </IconButton>
+                </Box>
+
+                <CardContent>
+                  <form onSubmit={handleSubmit}>
+                    <TextField
+                      label="Category Name"
+                      id="name"
+                      value={categoryToEdit?.name}
+                      onChange={(event) => {
+                        setCategoryToEdit({...categoryToEdit, name: event.target.value})
+                      }}
+                      sx={{ m: 1, width: "35ch" }}
+                    />
+                    <TextField
+                      label="Category Description"
+                      id="description"
+                      value={categoryToEdit?.description}
+                      onChange={(event) => {
+                        setCategoryToEdit({...categoryToEdit, description: event.target.value})
+                      }}
+                      multiline
+                      sx={{ m: 1, width: "35ch" }}
+                    />
+
+                    <Button
+                      className="confirmer-button"
+                      variant="contained"
+                      color="success"
+                      onClick={handleEditCategory}
+                    >
+                      Confirm
+                    </Button>
+                    <Button
+                      onClick={handleCloseEditModal}
+                      className="confirmer-button"
+                      variant="contained"
+                      color="error"
+                      sx={{ ml: 2 }}
+                    >
+                      Cancel
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
+            </Box>
+          </Modal>
         </div>
       ),
     },
@@ -156,24 +303,23 @@ const CategoryApplication = () => {
                       onChange={handleChange}
                     />
 
-                      <Button
-                        type="submit"
-                        className="confirmer-button"
-                        variant="contained"
-                        color="success"
-                      >
-                        Confirm
-                      </Button>
-                      <Button
-                        onClick={handleClose}
-                        className="confirmer-button"
-                        variant="contained"
-                        color="error"
-                        sx={{ ml: 2 }}
-                      >
-                        Cancel
-                      </Button>
-                    
+                    <Button
+                      type="submit"
+                      className="confirmer-button"
+                      variant="contained"
+                      color="success"
+                    >
+                      Confirm
+                    </Button>
+                    <Button
+                      onClick={handleClose}
+                      className="confirmer-button"
+                      variant="contained"
+                      color="error"
+                      sx={{ ml: 2 }}
+                    >
+                      Cancel
+                    </Button>
                   </form>
                 </CardContent>
               </Card>
@@ -194,6 +340,9 @@ const CategoryApplication = () => {
               "& .MuiDataGrid-row:nth-of-type(even)": {
                 backgroundColor: "#F8F8FF",
               },
+              "& .MuiDataGrid-cell:focus": {
+                outline: " none",
+              },
             }}
             initialState={{
               pagination: {
@@ -201,6 +350,8 @@ const CategoryApplication = () => {
               },
             }}
             pageSizeOptions={[5, 10]}
+            // isRowSelectable={()=> false}
+            disableRowSelectionOnClick
           />
         </div>
       </Card>
