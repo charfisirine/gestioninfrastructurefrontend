@@ -1,15 +1,18 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  categoryServeurs: null, // Un tableau des catégories de serveurs
+  categoryServeurs: null,
   loading: true,
 };
 
+// The createSlice function is used to create a Redux slice for managing the state of CategoryServeur.
 export const CategoryServeurSlice = createSlice({
-  name: "categoryServeur",
+  name: "categoryServeurs",
   initialState,
   reducers: {
+    // Reducers to modify the state
     setCategoryServeurSlice: (state, action) => {
+      // Set the categoryServeurs with the data passed in action.payload
       state.categoryServeurs = action.payload;
       state.loading = false;
     },
@@ -41,6 +44,7 @@ export const CategoryServeurSlice = createSlice({
   },
 });
 
+// Export the actions to be used in components and sagas
 export const {
   setCategoryServeurSlice,
   setCategoryServeurStatus,
@@ -48,5 +52,3 @@ export const {
   addCategoryServeurSlice,
   updateCategoryServeurSlice,
 } = CategoryServeurSlice.actions;
-
-export default CategoryServeurSlice.reducer;

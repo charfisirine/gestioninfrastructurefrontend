@@ -8,6 +8,7 @@ import {
 } from "react-router-dom";
 import CategoryServeur from './Components/CategoryServeur/CategoryServeur';
 import CategoryApplication from './Components/CategoryApplication/CategoryApplication';
+import Site from "./Components/Site/Site";
 import Navbar from './Components/Navbar/Navbar';
 
 const App = () => {
@@ -17,6 +18,7 @@ const App = () => {
       <Routes>
       <Route path="/CategoryServeur" element={<CategoryServeur/>} />
       <Route path="/CategoryApplication" element={<CategoryApplication/>} />
+      <Route path="/site" element={<Site/>} />
 
        
       </Routes>
