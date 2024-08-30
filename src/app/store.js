@@ -10,17 +10,31 @@ import { categoryServeurSaga } from '../Components/CategoryServeur/categoryServe
 import { SiteSlice } from '../Components/Site/siteSlice';
 import sitesSaga, { SliceSaga } from '../Components/Site/siteSaga';
 
+import { ApplicationSlice } from '../Components/Application/ApplicationSlice';
+import applicationsSaga from '../Components/Application/applicationSaga';
+
+import { ClusterApplicationSlice} from '../Components/ClusterApplication/ClusterApplicationSlice';
+import clusterApplicationSaga from '../Components/ClusterApplication/clusterApplicationSaga';
+
+import { ClusterSlice} from '../Components/Cluster/ClusterSlice';
+import {clusterSaga} from '../Components/Cluster/clusterSaga';
+
 const rootReducers = combineReducers({
   appcategorie: CategoryApplicationSlice.reducer,
   categoryServeur: CategoryServeurSlice.reducer, 
-  site: SiteSlice.reducer, 
+  site: SiteSlice.reducer,
+  application: ApplicationSlice.reducer, 
+  clusterApplication:ClusterApplicationSlice.reducer,
+  cluster:ClusterSlice.reducer,
 });
 
 const rootSagas = function* rootSaga() {
   yield all([
     appcategoriesSaga.saga(),
     categoryServeurSaga.saga(), // Add the CategoryServeur saga
-    sitesSaga.saga(), 
+    sitesSaga.saga(),
+   // clusterApplicationSaga.saga(),
+  
   ]);
 };
 
