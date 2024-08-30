@@ -19,6 +19,18 @@ import clusterApplicationSaga from '../Components/ClusterApplication/clusterAppl
 import { ClusterSlice} from '../Components/Cluster/ClusterSlice';
 import {clusterSaga} from '../Components/Cluster/clusterSaga';
 
+import { ServeurApplicationSlice} from '../Components/ServeurApplication/ServeurApplicationSlice';
+import {serveurApplicationSaga} from '../Components/ServeurApplication/serveurApplicationSaga';
+
+import { ServeurSlice} from '../Components/Serveur/ServeurSlice';
+import {serveurSaga} from '../Components/Serveur/serveurSaga';
+
+import {SousReseauSlice} from '../Components/SousReseau/SousReseauSlice';
+import {sousReseauSaga} from '../Components/SousReseau/sousReseauSaga';
+
+import {ReseauSlice} from '../Components/Reseau/ReseauSlice';
+import {ReseauSaga} from '../Components/Reseau/reseauSaga';
+
 const rootReducers = combineReducers({
   appcategorie: CategoryApplicationSlice.reducer,
   categoryServeur: CategoryServeurSlice.reducer, 
@@ -26,6 +38,10 @@ const rootReducers = combineReducers({
   application: ApplicationSlice.reducer, 
   clusterApplication:ClusterApplicationSlice.reducer,
   cluster:ClusterSlice.reducer,
+  serveurApplication:ServeurApplicationSlice.reducer,
+  serveur:ServeurSlice.reducer,
+  sousReseau:SousReseauSlice.reducer,
+  reseau:ReseauSlice.reducer,
 });
 
 const rootSagas = function* rootSaga() {

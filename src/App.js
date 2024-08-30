@@ -12,7 +12,13 @@ import Site from "./Components/Site/Site";
 import Application from "./Components/Application/Application";
 import ClusterApplication from "./Components/ClusterApplication/ClusterApplication";
 import Cluster from "./Components/Cluster/Cluster";
+import ServeurApplication from "./Components/ServeurApplication/ServeurApplication";
+
+
 import Navbar from './Components/Navbar/Navbar';
+import Serveur from './Components/Serveur/Serveur';
+import SousReseau from './Components/SousReseau/SousReseau';
+import Reseau from './Components/Reseau/Reseau';
 
 const App = () => {
   return (
@@ -25,6 +31,10 @@ const App = () => {
       <Route path="/application" element={<Application/>} />
       <Route path="/clusterApplication" element={<ClusterApplication/>} />
       <Route path="/cluster" element={<Cluster/>} />
+      <Route path="/ServeurApplication" element={<ServeurApplication/>} />
+      <Route path="/Serveur" element={<Serveur/>} />
+      <Route path="/SousReseau" element={<SousReseau/>} />
+      <Route path="/Reseau" element={<Reseau/>} />
 
 
        
