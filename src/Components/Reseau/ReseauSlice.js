@@ -13,7 +13,7 @@ export const ReseauSlice = createSlice({
     // Reducers to modify the state
     setReseauSlice: (state, action) => {
       // Set the reseaux with the data passed in action.payload
-      state.reseaux = action.payload;
+      state.reseaux = action.payload.map((item) => { return {...item, id: item.idReseau}});
       state.loading = false;
     },
     setReseauStatus: (state, action) => {
@@ -34,11 +34,11 @@ export const ReseauSlice = createSlice({
       );
     },
     addReseauSlice: (state, action) => {
-      state.reseaux.push(action.payload);
+      state.reseaux.push({...action.payload, id: action.payload.idReseau});
     },
     updateReseauSlice: (state, action) => {
       state.reseaux = state.reseaux.map((reseau) =>
-        reseau.id === action.payload.id ? action.payload : reseau
+        reseau.id === action.payload.id ? {...action.payload, id: action.payload.idReseau} : reseau
       );
     },
   },

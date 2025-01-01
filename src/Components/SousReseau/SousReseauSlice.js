@@ -13,7 +13,7 @@ export const SousReseauSlice = createSlice({
     // Reducers to modify the state
     setSousReseauxSlice: (state, action) => {
       // Set the sousReseaux with the data passed in action.payload
-      state.sousReseaux = action.payload;
+      state.sousReseaux = action.payload.map((item)=>{return {...item,id:item.idSousReseau}});
       state.loading = false;
     },
     setSousReseauStatus: (state, action) => {

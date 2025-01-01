@@ -38,7 +38,7 @@ const SousReseau = () => {
   const dispatch = useDispatch();
   const { sousReseaux } = useSelector((state) => state.sousReseau);
   const [formData, setFormData] = useState({
-    CIDRnotation: "",
+    cidrnotation: "",
     masqueSousReseau: "",
     ipRange: "",
     gateway: "",
@@ -55,7 +55,7 @@ const SousReseau = () => {
     e.preventDefault();
     dispatch(postSousReseauForm({ ...formData }));
     setFormData({
-      CIDRnotation: "",
+      cidrnotation: "",
       masqueSousReseau: "",
       ipRange: "",
       gateway: "",
@@ -93,7 +93,7 @@ const SousReseau = () => {
 
   const columns = [
     { field: "id", headerName: "ID", width: 70 },
-    { field: "CIDRnotation", headerName: "CIDR Notation", width: 150 },
+    { field: "cidrnotation", headerName: "CIDR Notation", width: 150 },
     { field: "masqueSousReseau", headerName: "Sous Reseau", width: 150 },
     { field: "ipRange", headerName: "IP Range", width: 150 },
     { field: "gateway", headerName: "Gateway", width: 150 },
@@ -111,8 +111,8 @@ const SousReseau = () => {
           />
           <Modal open={isDeleteModalOpen}>
             <Box className="modal-box-sous-reseau">
-              <Card>
-                <Box
+              <Card> 
+                <Box 
                   sx={{
                     display: "flex",
                     justifyContent: "space-between",
@@ -141,7 +141,7 @@ const SousReseau = () => {
                   >
                     Yes
                   </Button>
-                  <Button
+                  <Button 
                     onClick={handleCloseDeleteModal}
                     className="confirmer-button"
                     variant="contained"
@@ -183,12 +183,12 @@ const SousReseau = () => {
                 <CardContent>
                   <TextField
                     label="CIDR Notation"
-                    id="CIDRnotation"
-                    value={sousReseauToEdit?.CIDRnotation}
+                    id="cidrnotation"
+                    value={sousReseauToEdit?.cidrnotation}
                     onChange={(event) =>
                       setSousReseauToEdit({
                         ...sousReseauToEdit,
-                        CIDRnotation: event.target.value,
+                        cidrnotation: event.target.value,
                       })
                     }
                     sx={{ m: 1, width: "35ch" }}
@@ -256,18 +256,14 @@ const SousReseau = () => {
   ];
 
   return (
-    <div>
-   <Button
-  onClick={handleOpen}
-  className="add-button"
-  variant="contained"
-  color="primary"
->
-  Add Sous Reseau
-</Button>
-
+    <Box
+      sx={{ display: "flex", flexWrap: "wrap" }}
+      className="custom-Category-box"
+    >
       <Modal open={open} onClose={handleClose}>
         <Box className="modal-box-sous-reseau">
+
+          <h2>Add Sous Réseau</h2>
           <Card>
             <Box
               sx={{
@@ -277,19 +273,24 @@ const SousReseau = () => {
                 padding: 1,
               }}
             >
-              <IconButton
-                onClick={handleClose}
-                size="large"
-                color="inherit"
-              >
+              <IconButton onClick={handleClose} size="large" color="inherit">
                 <CloseOutlinedIcon />
               </IconButton>
             </Box>
-            <CardContent>
+
+            <Button
+              onClick={handleOpen}
+              className="add-button"
+              variant="contained"
+              color="primary"
+            >
+              Add Sous Reseau
+            </Button>
+            <Card>
               <TextField
                 label="CIDR Notation"
-                id="CIDRnotation"
-                value={formData.CIDRnotation}
+                id="cidrnotation"
+                value={formData.cidrnotation}
                 onChange={handleChange}
                 sx={{ m: 1, width: "35ch" }}
               />
@@ -331,7 +332,7 @@ const SousReseau = () => {
               >
                 Cancel
               </Button>
-            </CardContent>
+            </Card>
           </Card>
         </Box>
       </Modal>
@@ -346,7 +347,7 @@ const SousReseau = () => {
           checkboxSelection
         />
       </Box>
-    </div>
+    </Box>
   );
 };
 

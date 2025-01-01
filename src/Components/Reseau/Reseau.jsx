@@ -18,7 +18,19 @@ import {
   postReseauForm,
   updateReseau,
 } from "./reseauSaga"; // Assurez-vous que ces actions sont définies dans votre saga
-import { Typography } from "@mui/material";
+import {
+  Checkbox,
+  Chip,
+  FormControl,
+  InputLabel,
+  ListItemText,
+  MenuItem,
+  OutlinedInput,
+  Select,
+  Typography,
+} from "@mui/material";
+import { getsitesList } from "../Site/siteSaga";
+import { getSousReseauxList } from "../SousReseau/sousReseauSaga";
 
 const Reseau = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -37,12 +49,27 @@ const Reseau = () => {
 
   const dispatch = useDispatch();
   const { reseaux } = useSelector((state) => state.reseau);
+  const { sites } = useSelector((state) => state.site);
+  const { sousReseaux } = useSelector((state) => state.sousReseau);
   const [formData, setFormData] = useState({
     name: "",
     ipRange: "",
     typeReseau: "",
-    site_id: "", // Ajout du champ site_id
+    site: {},
+    sousReseaux: [],
   });
+
+  useEffect(() => {
+    if (!sites) {
+      dispatch(getsitesList());
+    }
+  }, [sites, dispatch]);
+
+  useEffect(() => {
+    if (!sousReseaux) {
+      dispatch(getSousReseauxList());
+    }
+  }, [sousReseaux, dispatch]);
 
   useEffect(() => {
     if (!reseaux) {
@@ -53,10 +80,15 @@ const Reseau = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     dispatch(postReseauForm({ ...formData }));
-    setFormData({ name: "", ipRange: "", typeReseau: "", site_id: "" });
+    setFormData({
+      name: "",
+      ipRange: "",
+      typeReseau: "",
+      site: "",
+      sousReseaux: [],
+    });
     handleClose();
   };
-
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
@@ -83,13 +115,31 @@ const Reseau = () => {
     dispatch(updateReseau(reseauToEdit));
     setIsEditModalOpen(false);
   };
-
+  console.log({ reseauToEdit });
+  console.log({ rr: reseauToEdit?.site?.designation });
   const columns = [
     { field: "id", headerName: "ID", width: 70 },
     { field: "name", headerName: "Name", width: 150 },
     { field: "ipRange", headerName: "IP Range", width: 150 },
     { field: "typeReseau", headerName: "Type", width: 150 },
-    { field: "site_id", headerName: "Site ID", width: 150 }, // Colonne pour site_id
+    {
+      field: "site",
+      headerName: "Site Name",
+      width: 150,
+      renderCell: (params) => <div>{params.row?.site?.designation}</div>,
+    },
+    {
+      field: "subnet",
+      headerName: "Subnets",
+      width: 250,
+      renderCell: (params) => (
+        <div>
+          {params.row?.sousReseaux
+            .map((item) => `${item.cidrnotation}`)
+            .join(", ")}
+        </div>
+      ),
+    },
     {
       field: "action",
       headerName: "Action",
@@ -123,7 +173,9 @@ const Reseau = () => {
                   </IconButton>
                 </Box>
                 <CardContent>
-                  <Typography>Are you sure you want to delete this Reseau?</Typography>
+                  <Typography>
+                    Are you sure you want to delete this Reseau?
+                  </Typography>
                   <Button
                     onClick={handleDeleteConfirmed}
                     className="confirmer-button"
@@ -209,18 +261,77 @@ const Reseau = () => {
                       }
                       sx={{ m: 1, width: "35ch" }}
                     />
-                    <TextField
-                      label="Site ID"
-                      id="site_id"
-                      value={reseauToEdit?.site_id}
-                      onChange={(event) =>
-                        setReseauToEdit({
-                          ...reseauToEdit,
-                          site_id: event.target.value,
-                        })
-                      }
-                      sx={{ m: 1, width: "35ch" }}
-                    />
+                    <FormControl fullWidth sx={{ m: 1, width: "35ch" }}>
+                      <InputLabel id="edit-site-select">Site</InputLabel>
+                      <Select
+                        labelId="edit-site-select"
+                        id="site"
+                        value={reseauToEdit?.site?.id}
+                        renderValue={(selected) => {
+                          if (selected) return reseauToEdit?.site?.designation;
+                        }}
+                        label="Site"
+                        placeholder="Site"
+                        onChange={(event) =>
+                          setReseauToEdit({
+                            ...reseauToEdit,
+                            site: event.target.value,
+                          })
+                        }
+                      >
+                        {sites?.map((site) => (
+                          <MenuItem key={site.id} value={site}>
+                            <em>{site.designation}</em>
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                    <FormControl sx={{ m: 1, width: "72ch" }}>
+                      <InputLabel id="subnet-multiple-select">
+                        Subnet
+                      </InputLabel>
+                      <Select
+                        labelId="subnet-multiple-select"
+                        id="subnet-select"
+                        multiple
+                        value={reseauToEdit?.sousReseaux}
+                        onChange={(event) =>
+                          setReseauToEdit({
+                            ...reseauToEdit,
+                            sousReseaux: event.target.value,
+                          })
+                        }
+                        input={
+                          <OutlinedInput
+                            id="select-multiple-chip"
+                            label="Subnet"
+                          />
+                        }
+                        renderValue={(selected) => (
+                          <Box
+                            sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}
+                          >
+                            {selected.map((value) => (
+                              <Chip
+                                key={value.idSousReseau}
+                                label={value.cidrnotation}
+                              />
+                            ))}
+                          </Box>
+                        )}
+                      >
+                        {sousReseaux?.map((item) => (
+                          <MenuItem key={item.idSousReseau} value={item}>
+                            <Checkbox
+                              checked={reseauToEdit?.sousReseaux.some(
+                                (elt) => elt.idSousReseau === item.idSousReseau
+                              )}
+                            />
+                            <ListItemText primary={item.cidrnotation} />
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
                     <Button
                       className="confirmer-button"
                       variant="contained"
@@ -247,87 +358,159 @@ const Reseau = () => {
       ),
     },
   ];
-
   return (
-    <div className="custom-Reseau-box">
-      <Card className="custom-Reseau-card">
-        <h2 className="h2-style">Reseau</h2>
-        <CardContent>
-          <div className="datagrid-style">
-            <Box sx={{ mb: 2 }}>
-              <Button
-                variant="contained"
-                color="success"
-                className="add-button"
-                onClick={handleOpen}
-              >
-                Add a Reseau
-              </Button>
-              <Modal open={open} onClose={handleClose}>
-                <Box className="modal-box-reseau">
-                  <h2>Add a Reseau</h2>
-                  <form onSubmit={handleSubmit}>
-                    <TextField
-                      label="Name"
-                      id="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      sx={{ m: 1, width: "35ch" }}
-                    />
-                    <TextField
-                      label="IP Range"
-                      id="ipRange"
-                      value={formData.ipRange}
-                      onChange={handleChange}
-                      sx={{ m: 1, width: "35ch" }}
-                    />
-                    <TextField
-                      label="Type"
-                      id="typeReseau"
-                      value={formData.typeReseau}
-                      onChange={handleChange}
-                      sx={{ m: 1, width: "35ch" }}
-                    />
-                    <TextField
-                      label="Site ID"
-                      id="site_id"
-                      value={formData.site_id}
-                      onChange={handleChange}
-                      sx={{ m: 1, width: "35ch" }}
-                    />
-                    <Button
-                      className="confirmer-button"
-                      variant="contained"
-                      color="success"
-                      type="submit"
+    <Box
+      sx={{ display: "flex", flexWrap: "wrap" }}
+      className="custom-Category-box"
+    >
+      <Card variant="outlined" className="custom-Category-card">
+        <Box
+          sx={{
+            padding: "2CH",
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              paddingLeft: "2CH",
+            }}
+          >
+            <h2 className="h2-style">Reseau</h2>
+
+            <Button
+              variant="contained"
+              className="add-button"
+              onClick={handleOpen}
+            >
+              Add Reseau
+            </Button>
+            <Modal open={open} onClose={handleClose}>
+              <Box className="modal-box-reseau">
+                <h2>Add a Reseau</h2>
+                <form onSubmit={handleSubmit}>
+                  <TextField
+                    label="Name"
+                    id="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    sx={{ m: 1, width: "35ch" }}
+                  />
+                  <TextField
+                    label="IP Range"
+                    id="ipRange"
+                    value={formData.ipRange}
+                    onChange={handleChange}
+                    sx={{ m: 1, width: "35ch" }}
+                  />
+                  <TextField
+                    label="Type"
+                    id="typeReseau"
+                    value={formData.typeReseau}
+                    onChange={handleChange}
+                    sx={{ m: 1, width: "35ch" }}
+                  />
+                  <FormControl fullWidth sx={{ m: 1, width: "35ch" }}>
+                    <InputLabel id="create-site-select">Site</InputLabel>
+                    <Select
+                      labelId="create-site-select"
+                      id="site"
+                      value={formData.site?.id}
+                      label="Site"
+                      placeholder="Site"
+                      onChange={(event) => {
+                        setFormData({
+                          ...formData,
+                          site: event.target.value,
+                        });
+                      }}
                     >
-                      Confirm
-                    </Button>
-                    <Button
-                      onClick={handleClose}
-                      className="confirmer-button"
-                      variant="contained"
-                      color="error"
-                      sx={{ ml: 2 }}
+                      {sites?.map((site) => (
+                        <MenuItem key={site.id} value={site}>
+                          <em>{site.designation}</em>
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  <FormControl sx={{ m: 1, width: "72ch" }}>
+                    <InputLabel id="create-subnet-multiple-select">
+                      Subnet
+                    </InputLabel>
+                    <Select
+                      labelId="create-subnet-multiple-select"
+                      id="subnet-select"
+                      multiple
+                      value={formData.sousReseaux}
+                      onChange={(event) => {
+                        setFormData({
+                          ...formData,
+                          sousReseaux: event.target.value,
+                        });
+                      }}
+                      input={
+                        <OutlinedInput
+                          id="select-multiple-chip"
+                          label="Subnet"
+                        />
+                      }
+                      renderValue={(selected) => (
+                        <Box
+                          sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}
+                        >
+                          {selected.map((value) => (
+                            <Chip
+                              key={value.idSousReseau}
+                              label={value.cidrnotation}
+                            />
+                          ))}
+                        </Box>
+                      )}
                     >
-                      Cancel
-                    </Button>
-                  </form>
-                </Box>
-              </Modal>
-            </Box>
-            <div className="div-reseau">
-              <DataGrid
-                rows={reseaux || []}
-                columns={columns}
-                pageSize={5}
-                rowsPerPageOptions={[5]}
-              />
-            </div>
+                      {sousReseaux?.map((item) => (
+                        <MenuItem key={item.idSousReseau} value={item}>
+                          <Checkbox
+                            checked={formData.sousReseaux.some(
+                              (elt) => elt.idSousReseau === item.idSousReseau
+                            )}
+                          />
+                          <ListItemText primary={item.cidrnotation} />
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  <Button
+                    className="confirmer-button"
+                    variant="contained"
+                    color="success"
+                    type="submit"
+                  >
+                    Confirm
+                  </Button>
+                  <Button
+                    onClick={handleClose}
+                    className="confirmer-button"
+                    variant="contained"
+                    color="error"
+                    sx={{ ml: 2 }}
+                  >
+                    Cancel
+                  </Button>
+                </form>
+              </Box>
+            </Modal>
+          </Box>
+          <div className="div-reseau">
+            <DataGrid
+              rows={reseaux || []}
+              columns={columns}
+              pageSize={5}
+              rowsPerPageOptions={[5]}
+            />
           </div>
-        </CardContent>
+        </Box>
       </Card>
-    </div>
+    </Box>
   );
 };
 

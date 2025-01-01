@@ -123,7 +123,9 @@ const CategoryServeur = () => {
                   </IconButton>
                 </Box>
                 <CardContent>
-                  <Typography>Are you sure you want to delete this category!</Typography>
+                  <Typography>
+                    Are you sure you want to delete this category!
+                  </Typography>
                   <Button
                     onClick={handleDeleteConfirmed}
                     className="confirmer-button"
@@ -240,7 +242,11 @@ const CategoryServeur = () => {
             }}
           >
             <h2 className="h2-style">List of Server's Categories</h2>
-            <Button variant="contained" onClick={handleOpen} className="add-button">
+            <Button
+              variant="contained"
+              onClick={handleOpen}
+              className="add-button"
+            >
               Add Category
             </Button>
           </Box>

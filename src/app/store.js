@@ -8,10 +8,9 @@ import { CategoryServeurSlice } from '../Components/CategoryServeur/CategoryServ
 import { categoryServeurSaga } from '../Components/CategoryServeur/categoryServeurSaga';
 
 import { SiteSlice } from '../Components/Site/siteSlice';
-import sitesSaga, { SliceSaga } from '../Components/Site/siteSaga';
+import sitesSaga from '../Components/Site/siteSaga';
 
 import { ApplicationSlice } from '../Components/Application/ApplicationSlice';
-import applicationsSaga from '../Components/Application/applicationSaga';
 
 import { ClusterApplicationSlice} from '../Components/ClusterApplication/ClusterApplicationSlice';
 import clusterApplicationSaga from '../Components/ClusterApplication/clusterApplicationSaga';
@@ -29,7 +28,8 @@ import {SousReseauSlice} from '../Components/SousReseau/SousReseauSlice';
 import {sousReseauSaga} from '../Components/SousReseau/sousReseauSaga';
 
 import {ReseauSlice} from '../Components/Reseau/ReseauSlice';
-import {ReseauSaga} from '../Components/Reseau/reseauSaga';
+import {reseauSaga} from '../Components/Reseau/reseauSaga';
+import {applicationsSaga} from '../Components/Application/applicationSaga';
 
 const rootReducers = combineReducers({
   appcategorie: CategoryApplicationSlice.reducer,
@@ -41,16 +41,22 @@ const rootReducers = combineReducers({
   serveurApplication:ServeurApplicationSlice.reducer,
   serveur:ServeurSlice.reducer,
   sousReseau:SousReseauSlice.reducer,
-  reseau:ReseauSlice.reducer,
+  reseau: ReseauSlice.reducer,
+  
 });
 
 const rootSagas = function* rootSaga() {
   yield all([
     appcategoriesSaga.saga(),
-    categoryServeurSaga.saga(), // Add the CategoryServeur saga
+    categoryServeurSaga.saga(),
     sitesSaga.saga(),
-   // clusterApplicationSaga.saga(),
-  
+    clusterApplicationSaga.saga(),
+    applicationsSaga.saga(),
+    serveurApplicationSaga.saga(),
+    reseauSaga.saga(),
+    clusterSaga.saga(),
+    serveurSaga.saga(),
+    sousReseauSaga.saga(),
   ]);
 };
 
